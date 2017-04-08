@@ -1,19 +1,51 @@
 #ifndef __X_TEXT_H__
 #define __X_TEXT_H__
 
-#include <psptypes.h>
+#include "xconfig.h"
 #include "xtexture.h"
 
-int xText2DPrintf(xTexture* bitmap, int x, int y, unsigned int color, int fw, float scale, bool aa, bool center, char* text, ... );
+#define X_ALIGN_LEFT   (0)
+#define X_ALIGN_CENTER (1)
+#define X_ALIGN_RIGHT  (2)
 
-int xText2DPrint(xTexture* bitmap, int x, int y, unsigned int color, int fw, float scale, bool aa, bool center, char* text);
+/* things to add
+    scale is independent of texture size - rather it is the pixel size of the characters
+    constant char width (another var in xBitmapFont)
+    wordwrap - shouldn't be too hard with length functions
+    xTextPrintSize( ... , float xsize, float ysize, ... )
+    ?
+ */
 
-int xText2DDraw(xTexture* bitmap, int x, int y, unsigned int color, int fw, u8* fwtab, float scale, bool aa, bool center, char* text);
+typedef struct {
+    xTexture* texture;
+    u16 widths[256];
+} xBitmapFont;
 
-int xText2DLength(xTexture* bitmap, int fw, u8* fwtab, float scale, char* text);
+/* texture should be pow2 aligned and contain left-justified characters */
+/* width file should contain 16bit unsigned character widths */
+/* http://www.lmnopc.com/bitmapfontbuilder/ */
+void xTextLoadFont(xBitmapFont* font, xTexture* texture, char* widths_filename);
 
-int xText2DStringLength(xTexture* bitmap, int fw, u8* fwtab, float scale, int width, char* dest, const char* src, int num);
+void xTextSetFont(xBitmapFont* font);
 
-void xText3DDraw(xTexture* bitmap, float x, float y, float z, float length, float height, unsigned int color, int fw, char* text);
+void xTextSetColor(u32 color);
+
+void xTextSetScale(float scale);
+
+void xTextSetAlign(int align);
+
+int xTextLength(char* text, int num);
+
+int xTextNumWithLength(char* src, int length);
+
+int xTextPrint(int x, int y, char* text, int num);
+
+int xTextPrintf(int x, int y, char* text, ... );
+
+/* unimplemented/unworking
+float xText3DPrint(ScePspFVector3* pos, float char_scale, float height, char* text, int num);
+
+float xText3DPrintf(ScePspFVector3* pos, float char_scale, float height, char* text, ... );
+*/
 
 #endif

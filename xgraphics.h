@@ -1,17 +1,19 @@
 #ifndef __X_GRAPHICS_H__
 #define __X_GRAPHICS_H__
 
+#include "xconfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Macros */
-#define X_PIXEL_BYTES (4)
-#define X_BUFFER_WIDTH (512)
-#define X_SCREEN_WIDTH (480)
-#define X_SCREEN_HEIGHT (272)
-#define X_FRAME_BUFFER_SIZE (X_PIXEL_BYTES*X_BUFFER_WIDTH*X_SCREEN_HEIGHT)
+/* pixel formats */
+#define X_PSM_5650 (GU_PSM_5650)
+#define X_PSM_5551 (GU_PSM_5551)
+#define X_PSM_4444 (GU_PSM_4444)
+#define X_PSM_8888 (GU_PSM_8888)
 
+/* graphics modes */
 #define X_ALPHA_TEST          (1 << GU_ALPHA_TEST)
 #define X_DEPTH_TEST          (1 << GU_DEPTH_TEST)
 #define X_SCISSOR_TEST        (1 << GU_SCISSOR_TEST)
@@ -34,142 +36,106 @@ extern "C" {
 #define X_FACE_NORMAL_REVERSE (1 << GU_FACE_NORMAL_REVERSE)
 #define X_PATCH_FACE          (1 << GU_PATCH_FACE)
 #define X_FRAGMENT_2X         (1 << GU_FRAGMENT_2X)
+#define X_WAIT_VBLANK         (1 << 29)
+#define X_PSEUDO_AA           (1 << 30)
+#define X_DITHER_SMOOTH       (1 << 31)
 
-void xGuInit(unsigned int list_size, int states, unsigned int bgcolor);
+/* blend modes, thanks raphael */
+#define X_BLEND_NORMAL    (0) /* alpha blending */
+#define X_BLEND_ADD       (1)
+#define X_BLEND_GLENZ     (2)
+#define X_BLEND_ALPHA_ADD (3)
+#define X_BLEND_SUB       (4)
+#define X_BLEND_ALPHA_SUB (5)
+
+/* texture filter modes */
+#define X_NO_FILTER (GU_NEAREST)
+#define X_BILINEAR  (GU_LINEAR)
+#define X_TRILINEAR (GU_LINEAR_MIPMAP_LINEAR)
+
+/* texture effects */
+#define X_TFX_MODULATE (GU_TFX_MODULATE)
+#define X_TFX_DECAL    (GU_TFX_DECAL)
+#define X_TFX_BLEND    (GU_TFX_BLEND)
+#define X_TFX_REPLACE  (GU_TFX_REPLACE)
+#define X_TFX_ADD      (GU_TFX_ADD)
+
+/* screen data. changing this is not recommended, may break functions */
+#define X_SCREEN_WIDTH (480)
+#define X_SCREEN_HEIGHT (272)
+#define X_BUFFER_WIDTH (512)
+
+/* color macros */
+#define X_COLOR_5650(r,g,b)   (((r)<<0)|((g)<<5)|((b)<<11))
+#define X_COLOR_5551(r,g,b,a) (((r)<<0)|((g)<<5)|((b)<<10)|((a)<<15)
+#define X_COLOR_4444(r,g,b,a) (((r)<<0)|((g)<<4)|((b)<<8)|((a)<<12))
+#define X_COLOR_8888(r,g,b,a) (((r)<<0)|((g)<<8)|((b)<<16)|((a)<<24))
+#define X_COLOR_5650_32BITF(r,g,b)   (X_COLOR_5650((u8)(31.f*(r)), (u8)(63.f*(g)), (u8)(31.f*(b))))
+#define X_COLOR_5551_32BITF(r,g,b,a) (X_COLOR_5551((u8)(31.f*(r)), (u8)(31.f*(g)), (u8)(31.f*(b)), (u8)(1.f*(a))))
+#define X_COLOR_4444_32BITF(r,g,b,a) (X_COLOR_4444((u8)(15.f*(r)), (u8)(15.f*(g)), (u8)(15.f*(b)), (u8)(15.f*(a))))
+#define X_COLOR_8888_32BITF(r,g,b,a) (X_COLOR_8888((u8)(255.f*(r)),(u8)(255.f*(g)),(u8)(255*(b)),(u8)(255.f*(a))))
+
+void xGuInit(int psm, u32 list_size);
 
 void xGuEnd();
 
-void xGuFrameStart();
+int xGuFrameEnd();
 
-void xGuFrameEnd();
+void xGuClear(u32 color);
+
+void xGuPerspective(float fovy);
+
+int xGuSetOrtho();
+
+int xGuSetPerspective();
+
+void xGuEnable(int states);
+
+void xGuDisable(int states);
+
+void xGuRenderTarget(int psm, int width, int height, int tbw, void* tbp);
+
+void xGuRenderReset();
+
+void xGuBlend(int mode);
+
+void xGuTexFilter(int filter);
+
+void xGuTexMode(int tfx, int alpha, int repeat);
+
+void xGuClutFunc(int cpsm, int entries, void* cbp);
+
+void xGuTexFunc(int swizzle, float u_scale, float v_scale, int tpsm, int width, int height, int tbw, void* tbp);
+
+void xGumLoadIdentity();
+
+void xGumTranslate(float x, float y, float z);
+
+void xGumRotateX(float angle);
+
+void xGumRotateY(float angle);
+
+void xGumRotateZ(float angle);
+
+void xGumScale(float x, float y, float z);
+
+void xGumCamUp(float x, float y, float z);
+
+void xGumCamOrient(float px, float py, float pz, float dx, float dy, float dz);
+
+u32 xGuMemAvail();
 
 void xGuSaveStates();
-
 void xGuLoadStates();
-
-int xGuGetStatus(int states);
-
-void xGuEnableStates(int states);
-
-void xGuDisableStates(int states);
-
-void xGuBlendDefault();
-
-void xGuTexFilter(int aa);
-
-void xGuPerspective(float fovy, float near, float far);
-
-void xGuSwapBuffers(int wait_vblank);
-
-void xGuPseudoAntiAliase(float fov_change, int dither);
-
-unsigned int xGuPixelColor(int x, int y);
-
-void xGumCallList(const void* list);
-
-void xGumMove(float x, float y, float z);
-
-void xGumSetPos(float x, float y, float z);
-
-void xGumScaleMulti(float x, float y, float z);
-
-void xGumScaleSingle(float scale);
-
-void xGumSetCameraPos(float x, float y, float z);
-
-void xGumFrustumCullStart(float x_low, float y_low, float z_low, float x_high, float y_high, float z_high);
-
-void xGumFrustumCullEnd();
-
-typedef struct {
-    float x, y, z;
-} VertexF;
-
-#define VertexF_vtype (GU_VERTEX_32BITF)
-
-typedef struct {
-    float u, v;
-    float x, y, z;
-} TVertexF;
-
-#define TVertexF_vtype (GU_TEXTURE_32BITF|GU_VERTEX_32BITF)
-
-typedef struct {
-    unsigned int color;
-    float x, y, z;
-} CVertexF;
-
-#define CVertexF_vtype (GU_COLOR_8888|GU_VERTEX_32BITF)
-
-typedef struct {
-    float nx, ny, nz;
-    float x, y, z;
-} NVertexF;
-
-#define NVertexF_vtype (GU_NORMAL_32BITF|GU_VERTEX_32BITF)
-
-typedef struct {
-    float u, v;
-    float nx, ny, nz;
-    float x, y, z;
-} TNVertexF;
-
-#define TNVertexF_vtype (GU_COLOR_8888|GU_NORMAL_32BITF|GU_VERTEX_32BITF)
-
-typedef struct {
-    float u, v;
-    unsigned int color;
-    float x, y, z;
-} TCVertexF;
-
-#define TCVertexF_vtype (GU_TEXTURE_32BITF|GU_COLOR_8888|GU_VERTEX_32BITF)
-
-typedef struct {
-    unsigned int color;
-    float nx, ny, nz;
-    float x, y, z;
-} CNVertexF;
-
-#define CNVertexF_vtype (GU_COLOR_8888|GU_NORMAL_32BITF|GU_VERTEX_32BITF)
-
-typedef struct {
-    s16 x, y, z;
-} Vertex2D;
-
-#define Vertex2D_vtype (GU_VERTEX_16BIT)
-
-typedef struct {
-    unsigned int color;
-    s16 x, y, z;
-} CVertex2D;
-
-#define CVertex2D_vtype (GU_COLOR_8888|GU_VERTEX_16BIT)
-
-typedef struct {
-    s16 u, v;
-    s16 x, y, z;
-} TVertex2D;
-
-#define TVertex2D_vtype (GU_TEXTURE_16BIT|GU_VERTEX_16BIT)
-
-typedef struct {
-    s16 u, v;
-    unsigned int color;
-    s16 x, y, z;
-} TCVertex2D;
-
-#define TCVertex2D_vtype (GU_TEXTURE_16BIT|GU_COLOR_8888|GU_VERTEX_16BIT)
-
-typedef struct {
-    s8 u, v;
-    float x, y, z;
-} GenVert;
-
-#define xGenericVert_vtype (GU_TEXTURE_8BIT|GU_VERTEX_32BITF)
-#define xGenericVert_prim (GU_TRIANGLE_FAN)
-#define xGenericVert_count (4)
-
-extern GenVert xGenericVert[4];
+void* xGuDrawPtr(int uncached, int abs);
+void* xGuDispPtr(int uncached, int abs);
+void* xGuDepthPtr(int uncached, int abs);
+void* xGuStridePtr(int uncached, int abs);
+void xGuSetDebugTex();
+void xGumDrawUnitTexQuad();
+void xGuDrawTex(int x, int y, int w, int h, int sx, int sy, int sw, int sh);
+void xGuTexScaleToDest(int psm, int sw, int sh, int sbw, void* src, int dw, int dh, int dbw, void* dest);
+void xGuDrawOverlay(u32 color);
 
 #ifdef __cplusplus
 }
