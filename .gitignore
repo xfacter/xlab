@@ -1,0 +1,11 @@
+*.o
+*.d
+*.prx
+*.elf
+*.PBP
+*.SFO
+[Bb]in/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+xlog.txt
