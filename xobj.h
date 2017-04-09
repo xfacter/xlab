@@ -7,20 +7,23 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct xObj {
+	int type;
+	int vtype;
+	ScePspFVector3 bbox[8];
+	ScePspFVector3 scale;
+	ScePspFVector3 pos;
     int num_verts;
-    int vtype;
-    void* vertices;
+	void* vertices;
 } xObj;
 
-int xObjLoad(xObj* object, char* filename);
+xObj* xObjLoad(char* filename, int optimize);
 
 void xObjFree(xObj* object);
 
-/* experimental, doesnt seem to work */
-//void xObjOptimize(xObj* object);
+void xObjTranslate(xObj* object);
 
-void xObjDraw(xObj* object);
+void xObjDraw(xObj* object, int reverse_frontface);
 
 #ifdef __cplusplus
 }

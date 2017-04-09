@@ -16,7 +16,7 @@
     ?
  */
 
-typedef struct {
+typedef struct xBitmapFont {
     xTexture* texture;
     u16 widths[256];
 } xBitmapFont;
@@ -24,7 +24,9 @@ typedef struct {
 /* texture should be pow2 aligned and contain left-justified characters */
 /* width file should contain 16bit unsigned character widths */
 /* http://www.lmnopc.com/bitmapfontbuilder/ */
-void xTextLoadFont(xBitmapFont* font, xTexture* texture, char* widths_filename);
+xBitmapFont* xTextLoadFont(xTexture* tex, char* widths_filename);
+
+void xTextFreeFont(xBitmapFont* font);
 
 void xTextSetFont(xBitmapFont* font);
 
@@ -38,7 +40,7 @@ int xTextLength(char* text, int num);
 
 int xTextNumWithLength(char* src, int length);
 
-int xTextPrint(int x, int y, char* text, int num);
+int xTextPrint(int x, int y, char* text);
 
 int xTextPrintf(int x, int y, char* text, ... );
 

@@ -2,25 +2,16 @@
 #define __X_MATH_H__
 
 #include "xconfig.h"
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define X_PI     (3.1415926536f)
-#define X_2PI    (6.2831853072f)
-#define X_PI_2   (1.5707963268f)
-#define X_PI_3   (1.0471975512f)
-#define X_PI_4   (0.7853981634f)
-#define X_PI_6   (0.5235987756f)
-#define X_EULER  (2.7182818285f)
-#define X_ROOT2  (1.4142135624f)
-#define X_ROOT3  (1.7320508076f)
-#define X_PI_180 (0.0174532925f)
-#define X_180_PI (57.2957795130f)
+#define X_EPSILON 1e-6
 
-#define DEG_TO_RAD(DEG) ((DEG)*X_PI_180)
-#define RAD_TO_DEG(RAD) ((RAD)*X_180_PI)
+#define DEG_TO_RAD(DEG) ((DEG)*M_PI/180)
+#define RAD_TO_DEG(RAD) ((RAD)*180/M_PI)
 #define SQR(X) ((X)*(X))
 
 /* possibly add an error variable to see if a domain or other error occurred */
@@ -29,7 +20,6 @@ void  x_srand(u32 s);
 void  x_auto_srand();
 int   x_randi(int min, int max);
 float x_randf(float min, float max);
-float x_recip(float x);
 float x_sqrtf(float x);
 float x_modf(float x, float y);
 float x_sinf(float x);
@@ -76,7 +66,7 @@ void  x_rotatez(ScePspFVector3* v, float x);
 void  x_billboard(ScePspFVector3* r, ScePspFVector3* pos, ScePspFMatrix4* view_mat);
 void  x_billboard_dir(ScePspFVector3* r, ScePspFVector3* eye, ScePspFVector3* pos, ScePspFVector3* dir);
 
-void  x_ease_to_target1(float* cur, float target, float p, float dt);
+float x_ease_to_target(float cur, float target, float p, float dt);
 void  x_ease_to_target2(float* cur_x, float* cur_y, float target_x, float target_y, float p, float dt);
 void  x_ease_to_target3(ScePspFVector3* cur, ScePspFVector3* target, float p, float dt);
 
@@ -84,6 +74,23 @@ float x_dist2(float x1, float y1, float x2, float y2);
 float x_dist3(ScePspFVector3* p1, ScePspFVector3* p2);
 int   x_dist_test2(float x1, float y1, float x2, float y2, float d);
 int   x_dist_test3(ScePspFVector3* p1, ScePspFVector3* p2, float d);
+
+
+xVector3f* xVec3Set(xVector3f* a, float x, float y, float z);
+xVector3f* xVec3Add(xVector3f* r, xVector3f* a, xVector3f* b);
+xVector3f* xVec3Sub(xVector3f* r, xVector3f* a, xVector3f* b);
+xVector3f* xVec3Mul(xVector3f* r, xVector3f* a, xVector3f* b);
+xVector3f* xVec3Div(xVector3f* r, xVector3f* a, xVector3f* b);
+xVector3f* xVec3Scale(xVector3f* r, xVector3f* a, float s);
+xVector3f* xVec3Normalize(xVector3f* r, xVector3f* a);
+float xVec3Length(xVector3f* a);
+float xVec3SqLength(xVector3f* a);
+xVector3f* xVec3Lerp(xVector3f* r, xVector3f* a, xVector3f* b, float t);
+float xVec3Dot(xVector3f* a, xVector3f* b);
+xVector3f* xVec3Cross(xVector3f* r, xVector3f* a, xVector3f* b);
+
+xColor4f* xCol4Set(xColor4f* c, float r, float g, float b, float a);
+xColor4f* xCol4Lerp(xColor4f* r, xColor4f* a, xColor4f* b, float t);
 
 #ifdef __cplusplus
 }

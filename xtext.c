@@ -9,13 +9,6 @@
 
 #include "xtext.h"
 
-#ifdef X_DEBUG
-#include "xlog.h"
-#define X_LOG(format, ... ) xLogPrintf("xText: " format, __VA_ARGS__)
-#else
-#define X_LOG(format, ... ) do{}while(0)
-#endif
-
 static xBitmapFont* x_current_font = 0;
 static u32 x_font_color = 0xffffffff;
 static float x_font_scale = 1.0f;
@@ -104,31 +97,48 @@ static u16 default_widths[256] =
     10, 10, 10, 10,
 };
 
-void xTextLoadFont(xBitmapFont* font, xTexture* texture, char* widths_filename)
+static void copy_widths(xBitmapFont* font)
 {
     if (!font) return;
-    font->texture = texture;
-    if (font->texture->Width() < 64 || font->texture->Width() != x_next_pow2(font->texture->Width()) || font->texture->Height() != font->texture->Width())
+    if (!font->texture) return;
+    memcpy(font->widths, default_widths, 256*sizeof(u16));
+    float scale = font->texture->width/128.0f;
+    int i;
+    for (i = 0; i < 256; i++)
     {
-        font->texture = 0;
-        return;
+        font->widths[i] = (u16)(scale*font->widths[i]);
+    }
+}
+
+xBitmapFont* xTextLoadFont(xTexture* tex, char* widths_filename)
+{
+	xBitmapFont* font = (xBitmapFont*)x_malloc(sizeof(xBitmapFont));
+	font->texture = NULL;
+    if (tex == NULL)
+    {
+		xTextFreeFont(font);
+        return NULL;
+    }
+    font->texture = tex;
+    if (font->texture->width < 64 || font->texture->width != x_next_pow2(font->texture->width) || font->texture->height != font->texture->width)
+    {
+		xTextFreeFont(font);
+        return NULL;
     }
     if (!widths_filename)
     {
-        memcpy(font->widths, default_widths, 256*sizeof(u16));
-        float scale = texture->Width()/128.0f;
-        int i;
-        for (i = 0; i < 256; i++)
-        {
-            font->widths[i] = (u16)(scale*font->widths[i]);
-        }
-        return;
+        copy_widths(font);
+        return font;
     }
     FILE* file = fopen(widths_filename, "rb");
-    {
-        fread(font->widths, 256*sizeof(u16), 1, file);
+    if (!file)
+	{
+        copy_widths(font);
+		goto end;
     }
+    fread(font->widths, 256*sizeof(u16), 1, file);
     fclose(file);
+end:
     if (!x_current_font)
     {
         xTextSetFont(font);
@@ -136,6 +146,15 @@ void xTextLoadFont(xBitmapFont* font, xTexture* texture, char* widths_filename)
         xTextSetScale(1.0f);
         xTextSetAlign(X_ALIGN_LEFT);
     }
+	return font;
+}
+
+void xTextFreeFont(xBitmapFont* font)
+{
+	if (font != NULL)
+	{
+		x_free(font);
+	}
 }
 
 void xTextSetFont(xBitmapFont* font)
@@ -160,11 +179,11 @@ void xTextSetAlign(int align)
 
 int xTextLength(char* text, int num)
 {
-    if (!x_current_font || !x_current_font->texture) return 0;
+    if (!x_current_font) return 0;
     
     float length = 0.0f;
     char* cur_char = text;
-    while (cur_char != '\0' && num >= 0)
+    while (cur_char != '\0' && num > 0)
     {
         length += x_font_scale*x_current_font->widths[(u8)*cur_char];
         cur_char += 1;
@@ -175,7 +194,7 @@ int xTextLength(char* text, int num)
 
 int xTextNumWithLength(char* src, int length)
 {
-    if (!x_current_font || !x_current_font->texture || !src || length <= 0)
+    if (!x_current_font || !src || length <= 0)
     {
         return 0;
     }
@@ -189,44 +208,49 @@ int xTextNumWithLength(char* src, int length)
 }
 
 typedef struct {
-    s16 u, v;
-    float x, y, z;
+	s16 u, v;
+	u32 color;
+    s16 x, y, z;
 } Text_Vert;
 
-#define Text_Vert_vtype (GU_TEXTURE_16BIT|GU_VERTEX_32BITF)
+#define Text_Vert_vtype (GU_TEXTURE_16BIT|GU_COLOR_8888|GU_VERTEX_16BIT)
 
-int xTextPrint(int x, int y, char* text, int num)
+int xTextPrint(int x, int y, char* text)
 {
-    if (!x_current_font || !x_current_font->texture) return 0;
+    if (!x_current_font) return 0;
+    if (!x_current_font->texture) return 0;
     
     float pos = (float)x;
-    int text_length = xTextLength(text, num);
+	int len = strlen(text);
+    int text_length = xTextLength(text, len);
     if (x_font_align == X_ALIGN_CENTER) pos -= 0.5f*text_length;
     else if (x_font_align == X_ALIGN_RIGHT) pos -= text_length;
     
-    u16 char_width = x_current_font->texture->Width() >> 4;
+    u16 char_width = x_current_font->texture->width/16;
 
-    Text_Vert* vertices = (Text_Vert*)sceGuGetMemory((num<<1)*sizeof(Text_Vert));
+    Text_Vert* vertices = (Text_Vert*)sceGuGetMemory(2*len*sizeof(Text_Vert));
     Text_Vert* vert_ptr = vertices;
     int i = 0;
-    while (/* *text != '\0' && num >= 0 */ i < num)
+    while (/* *text != '\0' && num >= 0 */ i < len)
     {
         int tx = (((u8)*text >> 0) & 0x0f) * char_width;
         int ty = (((u8)*text >> 4) & 0x0f) * char_width;
 
         vert_ptr->u = (s16)(tx);
-        vert_ptr->v = (s16)(x_current_font->texture->Height() - ty);
-        vert_ptr->x = (float)(pos);
-        vert_ptr->y = (float)(y);
+        vert_ptr->v = (s16)(x_current_font->texture->height - ty);
+		vert_ptr->color = x_font_color;
+        vert_ptr->x = (int)(pos);
+        vert_ptr->y = (int)(y);
         vert_ptr->z = 0.0f;
         
         vert_ptr += 1;
         pos += x_font_scale*x_current_font->widths[(u8)*text];
 
         vert_ptr->u = (s16)(tx + x_current_font->widths[(u8)*text]);
-        vert_ptr->v = (s16)(x_current_font->texture->Height() - ty - char_width);
-        vert_ptr->x = (float)(pos);
-        vert_ptr->y = (float)(y + x_font_scale*char_width);
+		vert_ptr->v = (s16)(x_current_font->texture->height - ty - char_width);
+		vert_ptr->color = x_font_color;
+        vert_ptr->x = (int)(pos);
+        vert_ptr->y = (int)(y + x_font_scale*char_width);
         vert_ptr->z = 0.0f;
         
         vert_ptr += 1;
@@ -235,14 +259,13 @@ int xTextPrint(int x, int y, char* text, int num)
         i += 1;
     }
 
-    xGuTexMode(X_TFX_MODULATE, 1, 1);
-    x_current_font->texture->SetImage();
+    xTexSetImage(x_current_font->texture);
     xGuSaveStates();
     sceGuEnable(GU_TEXTURE_2D);
     sceGuEnable(GU_BLEND);
+    sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
     sceGuDisable(GU_DEPTH_TEST);
-    sceGuColor(x_font_color);
-    sceGuDrawArray(GU_SPRITES, Text_Vert_vtype|GU_TRANSFORM_2D, num<<1, 0, vertices);
+    sceGuDrawArray(GU_SPRITES, Text_Vert_vtype|GU_TRANSFORM_2D, 2*len, 0, vertices);
     xGuLoadStates();
 
     return (int)text_length;
@@ -253,9 +276,9 @@ int xTextPrintf(int x, int y, char* text, ... )
     char buffer[512];
     va_list ap;
     va_start(ap, text);
-    int num = vsnprintf(buffer, sizeof(buffer), text, ap);
+    vsnprintf(buffer, sizeof(buffer), text, ap);
     va_end(ap);
-    return xTextPrint(x, y, buffer, num);
+    return xTextPrint(x, y, buffer);
 }
 
 /*
@@ -266,7 +289,7 @@ float xText3DPrint(xBitmapFont* font, float x, float y, float z, float fw_scale,
     
     float text_length = xTextLength(font, fw_scale, text);
     float pos = -0.5f*text_length;
-    u16 char_width = font->texture->Width() >> 4;
+    u16 char_width = font->texture->width >> 4;
 
     Text_Vert* vertices = (Text_Vert*)sceGuGetMemory(6*len*sizeof(Text_Vert));
     int i;
@@ -278,37 +301,37 @@ float xText3DPrint(xBitmapFont* font, float x, float y, float z, float fw_scale,
         int offset = (char_width - font->widths[index]) >> 1;
 
         vertices[i*6+0].u = (s16)(tx + offset);
-        vertices[i*6+0].v = (s16)(font->texture->Height() - ty - char_width);
+        vertices[i*6+0].v = (s16)(font->texture->height - ty - char_width);
         vertices[i*6+0].x = (float)(pos);
         vertices[i*6+0].y = (float)(y - 0.5f*height*char_width);
         vertices[i*6+0].z = 0.0f;
         
         vertices[i*6+1].u = (s16)(tx + offset);
-        vertices[i*6+1].v = (s16)(font->texture->Height() - ty - 1);
+        vertices[i*6+1].v = (s16)(font->texture->height - ty - 1);
         vertices[i*6+1].x = (float)(pos);
         vertices[i*6+1].y = (float)(y + 0.5f*height*char_width);
         vertices[i*6+1].z = 0.0f;
         
         vertices[i*6+2].u = (s16)(tx + offset + font->widths[index] + 1);
-        vertices[i*6+2].v = (s16)(font->texture->Height() - ty - 1);
+        vertices[i*6+2].v = (s16)(font->texture->height - ty - 1);
         vertices[i*6+2].x = (float)(pos + fw_scale*font->widths[index]);
         vertices[i*6+2].y = (float)(y + 0.5f*height*char_width);
         vertices[i*6+2].z = 0.0f;
 
         vertices[i*6+3].u = (s16)(tx + offset + font->widths[index] + 1);
-        vertices[i*6+3].v = (s16)(font->texture->Height() - ty - 1);
+        vertices[i*6+3].v = (s16)(font->texture->height - ty - 1);
         vertices[i*6+3].x = (float)(pos + fw_scale*font->widths[index]);
         vertices[i*6+3].y = (float)(y + 0.5f*height*char_width);
         vertices[i*6+3].z = 0.0f;
 
         vertices[i*6+4].u = (s16)(tx + offset + font->widths[index] + 1);
-        vertices[i*6+4].v = (s16)(font->texture->Height() - ty - char_width);
+        vertices[i*6+4].v = (s16)(font->texture->height - ty - char_width);
         vertices[i*6+4].x = (float)(pos + fw_scale*font->widths[index]);
         vertices[i*6+4].y = (float)(y - 0.5f*height*char_width);
         vertices[i*6+4].z = 0.0f;
 
         vertices[i*6+5].u = (s16)(tx + offset);
-        vertices[i*6+5].v = (s16)(font->texture->Height() - ty - char_width);
+        vertices[i*6+5].v = (s16)(font->texture->height - ty - char_width);
         vertices[i*6+5].x = (float)(pos);
         vertices[i*6+5].y = (float)(y - 0.5f*height*char_width);
         vertices[i*6+5].z = 0.0f;
@@ -329,7 +352,7 @@ float xText3DPrint(xBitmapFont* font, float x, float y, float z, float fw_scale,
     sceGumTranslate(&translate);
     
     xGuTexMode(X_TFX_MODULATE, 1, 1);
-    font->texture->SetImage();
+    xTexSetImage(font->texture);
 
     xGuSaveStates();
     sceGuEnable(GU_TEXTURE_2D);

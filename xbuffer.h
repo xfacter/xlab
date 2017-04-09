@@ -7,14 +7,14 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct xBuffer {
     int psm;
     u16 width;
     u16 height;
     u16 buf_width;
     u16 pow2_height;
-    float x_scale;
-    float y_scale;
+    float u_scale;
+    float v_scale;
     void* data;
 } xBuffer;
 
@@ -22,17 +22,15 @@ xBuffer* xBufferConstruct(int psm, int width, int height);
 
 void xBufferDestroy(xBuffer* b);
 
-void xBufferSetImage(xBuffer* b);
-
 xBuffer* xBufferFrameBuffer();
 
-void xBufferSetRenderTarget(xBuffer* b);
+void xBufferSetImage(xBuffer* b);
 
-void xBufferRenderReset();
+int xBufferSetRenderTarget(xBuffer* b);
 
-//void xBufferRenderFull
+void xBufferDrawA2B(xBuffer* a, xBuffer* b);
 
-//void xBufferSomeKindOfEffect();
+void xBuffer4x4Pcf(xBuffer* a, xBuffer* b);
 
 #ifdef __cplusplus
 }

@@ -37,14 +37,9 @@ void xTimeUpdate()
     }
 }
 
-inline float xTimeGetDt()
+inline float xTimeGetDeltaTime()
 {
     return delta_time;
-}
-
-inline float xTimeFpsExact()
-{
-    return 1.0f/delta_time;
 }
 
 inline int xTimeFpsApprox()

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <pspkernel.h>
 #include <psptypes.h>
+#include "xlog.h"
 
 /* TODO:
     * 3D text (xtext.h) (fix)
@@ -16,24 +17,34 @@
 #define X_LIB_USER
 //#define X_LIB_KERNEL
 
-//#define X_MODULE_WIFI
-//#define X_MODULE_MP3
+//#define X_GRAPHICS_2D
+#define X_GRAPHICS_3D
 
 #define X_DLIST_SINGLE
 //#define X_DLIST_DOUBLE
 
-#define X_DEPTH_BUFFER
-//#define X_NO_DEPTH_BUFFER
+#define X_SCREEN_WIDTH 480
+#define X_SCREEN_HEIGHT 272
+#define X_SCREEN_STRIDE 512
+#define X_SCREEN_PSM GU_PSM_5650
+#define X_LIST_KB 512
 
 #define X_TEX_TGA
 //#define X_TEX_PNG
 //#define X_TEX_BMP
 
-#define X_PARTICLE_COLOR
-//#define X_PARTICLE_NO_COLOR
+#define X_SOUND_CHANNEL 0
 
 #define X_MD2_SOFTWARE
 //#define X_MD2_HARDWARE
+
+typedef struct xVector3f {
+    float x, y, z;
+} xVector3f;
+
+typedef struct xColor4f {
+    float r, g, b, a;
+} xColor4f;
 
 typedef struct {
     int start;

@@ -2,26 +2,23 @@
 
 #include "xlib.h"
 
-#ifdef X_DEBUG
-#include "xlog.h"
-#define X_LOG(format, ... ) xLogPrintf("xLib: " format, __VA_ARGS__)
-#else
-#define X_LOG(format, ... ) do{}while(0)
-#endif
-
 #ifdef X_LIB_KERNEL
 PSP_MODULE_INFO("xLibApp", PSP_MODULE_KERNEL, 1, 1);
 PSP_MAIN_THREAD_ATTR(0);
+//PSP_HEAP_SIZE_MAX();
+PSP_HEAP_SIZE_KB(-64);
 #else
 PSP_MODULE_INFO("xLibApp", PSP_MODULE_USER, 1, 1);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
+//PSP_HEAP_SIZE_MAX();
+PSP_HEAP_SIZE_KB(-64);
 #endif
 
 static int x_running = 1;
 
 inline int xRunning()
 {
-	return (int)x_running;
+	return x_running;
 }
 
 inline void xExit()
@@ -31,7 +28,7 @@ inline void xExit()
 
 static int xExitCallback(int arg1, int arg2, void *common)
 {
-	x_running = 0;
+	xExit();
 	return 0;
 }
 
@@ -43,7 +40,7 @@ static int xCallbackThread(SceSize args, void *argp)
     return 0;
 }
 
-static int xSetupCallbacks()
+extern int xSetupCallbacks()
 {
     int thid = sceKernelCreateThread("xCallbackThread", xCallbackThread, 0x11, 0xFA0, PSP_THREAD_ATTR_USER, 0);
     if(thid >= 0) sceKernelStartThread(thid, 0, 0);
@@ -78,7 +75,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 #else
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     xSetupCallbacks();
     remove("./xlog.txt");

@@ -7,12 +7,9 @@
 extern "C" {
 #endif
 
-#define x_dt (xTimeGetDt())
-
 void xTimeInit();
 void xTimeUpdate();
-float xTimeGetDt();
-float xTimeFpsExact();
+float xTimeGetDeltaTime();
 int xTimeFpsApprox();
 float xTimeSecPassed();
 

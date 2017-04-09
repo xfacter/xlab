@@ -53,6 +53,7 @@ void* x_salloc(u32 size);
 /* realloc previously malloced main mem */
 void* x_remalloc(void* ptr, u32 size);
 
+/* free any kind of mem */
 void x_free(void* ptr);
 
 u32 x_vlargest();

@@ -6,50 +6,95 @@
 
 #include "xparticle.h"
 
-xParticleSystem* xParticleSystemConstruct(u32 max)
+xParticleSystem* xParticleSystemConstruct(u16 max)
 {
-    xParticleSystem* s = (xParticleSystem*)xMalloc(sizeof(xParticleSystem));
+    xParticleSystem* s = (xParticleSystem*)x_malloc(sizeof(xParticleSystem));
     if (!s) return 0;
-    s->particles = (xParticle*)xMalloc(num*sizeof(xParticle));
-    s->num = max;
-    s->counter = 0;
-    s->time = 0.0f;
-    if (!s->particles)
+    s->particles = (xParticle*)x_malloc(max*sizeof(xParticle));
+    s->particle_stack = (u16*)x_malloc(max*sizeof(u16));
+    if (!s->particles || !s->particle_stack)
     {
-        xFree(s);
+        xParticleSystemDestroy(s);
         return 0;
     }
+    
+    xVec3Set(&s->pos, 0.0f, 0.0f, 0.0f);
+    xVec3Set(&s->pos_rand, 0.0f, 0.0f, 0.0f);
+    xVec3Set(&s->vel, 0.0f, 0.0f, 0.0f);
+    xVec3Set(&s->vel_rand, 0.0f, 0.0f, 0.0f);
+    xVec3Set(&s->accel, 0.0f, 0.0f, 0.0f);
+    xCol4Set(&s->colors[0], 1.0f, 1.0f, 1.0f, 1.0f);
+    xCol4Set(&s->colors[1], 1.0f, 1.0f, 1.0f, 0.0f);
+	s->num_cols = 0;
+	s->sizes[0] = 1.0f;
+	s->sizes[1] = 1.0f;
+    s->num_sizes = 1;
+    s->size_rand = 0.0f;
+    s->life = 1.0f;
+    s->life_rand = 0.0f;
+	s->friction = 0.0f;
+    s->rate = 1;
+    s->prim = X_PARTICLE_SPRITES;
+    s->time = 0.0f;
+    s->num_particles = 0;
+    s->max_particles = max;
+	s->render = 0;
+    
+    int i;
+    for (i = 0; i < s->max_particles; i++)
+    {
+        s->particle_stack[i] = i;
+    }
+    
     return s;
 }
 
 void xParticleSystemDestroy(xParticleSystem* s)
 {
     if (!s) return;
-    if (!s->particles) xFree(s->particles);
-    xFree(s);
+    if (s->particles) x_free(s->particles);
+	if (s->particle_stack) x_free(s->particle_stack);
+    x_free(s);
 }
 
-static void x_particle_init_next(xParticleSystem* s)
+static void remove_particle(xParticleSystem* s, u16 idx)
 {
-    int n = s->counter;
-    s->particles[n].pos.x = s->pos.x + x_randf(-s->pos_rand.x, s->pos_rand.x);
-    s->particles[n].pos.y = s->pos.y + x_randf(-s->pos_rand.y, s->pos_rand.y);
-    s->particles[n].pos.z = s->pos.z + x_randf(-s->pos_rand.z, s->pos_rand.z);
-    s->particles[n].vel.x = s->vel.x + x_randf(-s->vel_rand.x, s->vel_rand.x);
-    s->particles[n].vel.y = s->vel.y + x_randf(-s->vel_rand.y, s->vel_rand.y);
-    s->particles[n].vel.z = s->vel.z + x_randf(-s->vel_rand.z, s->vel_rand.z);
-    s->particles[n].size = s->size + x_randf(-s->size_rand, s->size_rand);
-    s->particles[n].life = s->life + x_randf(-s->life_rand, s->life_rand);
-    s->counter += 1;
-    if (s->counter >= s->num) s->counter = 0;
+    if (s->num_particles <= 0) return;
+    s->num_particles -= 1;
+    if (s->num_particles == idx) return;
+    u16 temp = s->particle_stack[s->num_particles];
+    s->particle_stack[s->num_particles] = s->particle_stack[idx];
+    s->particle_stack[idx] = temp;
 }
 
-void xParticleSystemBurst(xParticleSystem* s, u32 num)
+static void create_particle(xParticleSystem* s)
 {
-    if (!s) return;
+    if (s->num_particles >= s->max_particles)
+        return;
+    xParticle* p = &s->particles[s->particle_stack[s->num_particles]];
+    p->pos = s->pos;
+    p->pos.x += x_randf(-s->pos_rand.x, s->pos_rand.x);
+    p->pos.y += x_randf(-s->pos_rand.y, s->pos_rand.y);
+    p->pos.z += x_randf(-s->pos_rand.z, s->pos_rand.z);
+    p->vel = s->vel;
+    p->vel.x += x_randf(-s->vel_rand.x, s->vel_rand.x);
+    p->vel.y += x_randf(-s->vel_rand.y, s->vel_rand.y);
+    p->vel.z += x_randf(-s->vel_rand.z, s->vel_rand.z);
+    p->size_rand = x_randf(-s->size_rand, s->size_rand);
+    p->age = 0.0f;
+    p->inv_life = 1.0f/(s->life + x_randf(-s->life_rand, s->life_rand));
+    s->num_particles += 1;
+}
+
+void xParticleSystemBurst(xParticleSystem* s, xParticleEmitter* e, int num)
+{
+    if (s == NULL || e == NULL) return;
+	s->pos = e->particle_pos;
+	if (e->new_velocity)
+		s->vel = e->particle_vel;
     while (num > 0)
     {
-        x_particle_init_next(s);
+        create_particle(s);
         num -= 1;
     }
 }
@@ -58,83 +103,212 @@ void xParticleSystemUpdate(xParticleSystem* s, float dt)
 {
     if (!s) return;
     int i;
-    for (i = 0; i < s->num; i++)
+    xParticle* p;
+    xVector3f temp_vec;
+    for (i = 0; i < s->num_particles; i++)
     {
-        if (s->particles[i].life > 0.0f)
+        p = &s->particles[s->particle_stack[i]];
+        p->age += dt;
+        if (p->age*p->inv_life >= 1.0f)
         {
-            s->particles[i].life -= dt;
-            s->particles[i].size += dt*s->growth;
-            s->particles[i].vel.x += s->accel.x;
-            s->particles[i].vel.y += s->accel.y;
-            s->particles[i].vel.z += s->accel.z;
-            s->particles[i].pos.x += s->vel.x;
-            s->particles[i].pos.y += s->vel.y;
-            s->particles[i].pos.z += s->vel.z;
+            //particle is dead
+            remove_particle(s, i);
+            i -= 1;
+        }
+        else
+        {
+            //forces/friction/binding/loosen
+			//d = v*t + (1/2)a*t^2
+			xVec3Scale(&temp_vec, &s->accel, 0.5f*dt);
+			xVec3Add(&temp_vec, &temp_vec, &p->vel);
+			xVec3Scale(&temp_vec, &temp_vec, dt);
+			xVec3Add(&p->pos, &p->pos, &temp_vec);
+			xVec3Add(&p->vel, &p->vel, xVec3Scale(&temp_vec, &s->accel, dt));
+			if (s->friction > 0.0f)
+				xVec3Scale(&p->vel, &p->vel, (1.0f - s->friction*dt));
+            //p->size += s->growth*dt;
         }
     }
     s->time += dt;
-    time_per = x_recip(s->rate);
-    while (s->time >= time_per)
-    {
-        x_particle_init_next(s);
-        s->time -= time_per;
-    }
+	if (s->rate > 0.0f)
+	{
+		float inv_rate = 1.0f/s->rate;
+		while (s->time >= inv_rate)
+		{
+			create_particle(s);
+			s->time -= inv_rate;
+		}
+	}
 }
 
 typedef struct {
+	s8 u, v;
+	u32 c;
     float x, y, z;
-} part_vert;
+} sprite_vertex;
 
-static part_vert __attribute__((aligned(16))) part_geom[2] = {
-    { 0.0f,  0.0f,  0.0f},
-    {-1.0f, -1.0f, -1.0f}
-};
+#define sprite_vertex_vtype GU_TEXTURE_8BIT|GU_COLOR_8888|GU_VERTEX_32BITF
 
-void xParticleSystemRender(xParticleSystem* s, int prim, int billboard)
+typedef struct {
+	u32 c;
+    float x, y, z;
+} primitive_vertex;
+
+#define primitive_vertex_vtype GU_COLOR_8888|GU_VERTEX_32BITF
+
+static inline u32 col4_to_8888(xColor4f* c)
 {
-    if (!s) return;
-    sceGuDepthMask(GU_TRUE);
+    return GU_COLOR(c->r, c->g, c->b, c->a);
+}
+
+void xParticleSystemRender(xParticleSystem* s, ScePspFMatrix4* view)
+{
+    if (s == NULL || view == NULL) return;
+	if (s->num_sizes <= 0) return;
     xGuSaveStates();
-    sceGuEnable(GU_BLEND);
     sceGuDisable(GU_LIGHTING);
+	sceGuDisable(GU_DITHER);
+	sceGuDepthMask(GU_TRUE);
+	sceGuShadeModel(GU_FLAT);
+
+    xParticle* p;
+    xColor4f color4f;
+	u32 color32;
+	float size;
+	int i;
+	if (s->render != 0)
+	{
+		for (i = 0; i < s->num_particles; i++)
+		{
+			s->render(s, &s->particles[s->particle_stack[i]], view);
+		}
+	}
+	else
+	{
+		switch (s->prim)
+		{
+		case X_PARTICLE_SPRITES:
+			{
+				xVector3f up_left = {-view->x.x + view->y.x, -view->x.y + view->y.y, -view->x.z + view->y.z};
+				sprite_vertex* vertices = (sprite_vertex*)sceGuGetMemory(2*s->num_particles*sizeof(sprite_vertex));
+				for (i = 0; i < s->num_particles; i++)
+				{
+					p = &s->particles[s->particle_stack[i]];
+					if (s->num_cols > 1)
+					{
+						float t = p->age * p->inv_life * (s->num_cols-1);
+						u8 idx = (u8)t;
+						t -= idx;
+						color32 = col4_to_8888(xCol4Lerp(&color4f, &s->colors[idx], &s->colors[idx+1], t));
+					}
+					else if (s->num_cols == 1)
+					{
+						color32 = col4_to_8888(&s->colors[0]);
+					}
+					else
+					{
+						color32 = ((u8)(p->age*p->inv_life*255.0f) << 24) | 0x00ffffff;
+					}
+					if (s->num_sizes == 1)
+					{
+						size = s->sizes[0] + p->size_rand;
+					}
+					else
+					{
+						float t = p->age * p->inv_life * (s->num_sizes-1);
+						u8 idx = (u8)t;
+						t -= idx;
+						size = s->sizes[idx] + t*(s->sizes[idx+1] - s->sizes[idx]);
+					}
+					xVector3f temp;
+					xVec3Scale(&temp, &up_left, 0.5f*size);
+					vertices[i*2+0].u = 0;
+					vertices[i*2+0].v = 127;
+					vertices[i*2+0].c = color32;
+					vertices[i*2+0].x = p->pos.x + temp.x;
+					vertices[i*2+0].y = p->pos.y + temp.y;
+					vertices[i*2+0].z = p->pos.z + temp.z;
+					vertices[i*2+1].u = 127;
+					vertices[i*2+1].v = 0;
+					vertices[i*2+1].c = color32;
+					vertices[i*2+1].x = p->pos.x - temp.x;
+					vertices[i*2+1].y = p->pos.y - temp.y;
+					vertices[i*2+1].z = p->pos.z - temp.z;
+				}
+				sceGumDrawArray(GU_SPRITES, sprite_vertex_vtype|GU_TRANSFORM_3D, 2*s->num_particles, 0, vertices);
+			}
+			break;
+		case X_PARTICLE_LINE_SPRITES:
+			//
+			break;
+		case X_PARTICLE_LINES:
+			{
+				sceGuDisable(GU_TEXTURE_2D);
+				primitive_vertex* vertices = (primitive_vertex*)sceGuGetMemory(2*s->num_particles*sizeof(primitive_vertex));
+				for (i = 0; i < s->num_particles; i++)
+				{
+					p = &s->particles[s->particle_stack[i]];
+					if (s->num_cols > 1)
+					{
+						float t = p->age * p->inv_life * (s->num_cols-1);
+						u8 idx = (u8)t;
+						t -= idx;
+						color32 = col4_to_8888(xCol4Lerp(&color4f, &s->colors[idx], &s->colors[idx+1], t));
+					}
+					else if (s->num_cols == 1)
+					{
+						color32 = col4_to_8888(&s->colors[0]);
+					}
+					else
+					{
+						color32 = ((u8)(p->age*p->inv_life*255.0f) << 24) | 0x00ffffff;
+					}
+					vertices[i*2+0].c = color32;
+					vertices[i*2+0].x = p->pos.x;
+					vertices[i*2+0].y = p->pos.y;
+					vertices[i*2+0].z = p->pos.z;
+					vertices[i*2+1].c = color32;
+					vertices[i*2+1].x = p->pos.x + p->vel.x;
+					vertices[i*2+1].y = p->pos.y + p->vel.y;
+					vertices[i*2+1].z = p->pos.z + p->vel.z;
+				}
+				sceGumDrawArray(GU_LINES, primitive_vertex_vtype|GU_TRANSFORM_3D, 2*s->num_particles, 0, vertices);
+			}
+			break;
+		default: //X_PARTICLE_POINTS
+			{
+				sceGuDisable(GU_TEXTURE_2D);
+				primitive_vertex* vertices = (primitive_vertex*)sceGuGetMemory(s->num_particles*sizeof(primitive_vertex));
+				for (i = 0; i < s->num_particles; i++)
+				{
+					p = &s->particles[s->particle_stack[i]];
+					if (s->num_cols > 1)
+					{
+						float t = p->age * p->inv_life * (s->num_cols-1);
+						u8 idx = (u8)t;
+						t -= idx;
+						color32 = col4_to_8888(xCol4Lerp(&color4f, &s->colors[idx], &s->colors[idx+1], t));
+					}
+					else if (s->num_cols == 1)
+					{
+						color32 = col4_to_8888(&s->colors[0]);
+					}
+					else
+					{
+						color32 = ((u8)(p->age*p->inv_life*255.0f) << 24) | 0x00ffffff;
+					}
+					vertices[i].c = color32;
+					vertices[i].x = p->pos.x;
+					vertices[i].y = p->pos.y;
+					vertices[i].z = p->pos.z;
+				}
+				sceGumDrawArray(GU_POINTS, primitive_vertex_vtype|GU_TRANSFORM_3D, s->num_particles, 0, vertices);
+			}
+			break;
+		}
+	}
     
-    ScePspFMatrix4 view_mat;
-    sceGumMatrixMode(GU_VIEW);
-    sceGumStoreMatrix(&view_mat);
-    sceGumLoadIdentity();
-    sceGumMatrixMode(GU_MODEL);
-    
-    ScePspFVector3 translate;
-    int i;
-    for (i = 0; i < s->num; i++)
-    {
-        if (s->particles[i].life > 0.0f)
-        {
-            x_billboard(&translate, &s->particles[i].pos, view_mat);
-            sceGumLoadIdentity();
-            sceGumTranslate(&translate);
-            switch (prim)
-            {
-                case X_PARTICLE_LINE:
-                    sceGumScale(&s->particles[i].vel);
-                    sceGumDrawArray(GU_LINES, GU_VERTEX_32BITF|GU_TRANFORM_3D, 2, 0, part_geom);
-                    break;
-                case X_PARTICLE_POINT:
-                    sceGumDrawArray(GU_POINTS, GU_VERTEX_32BITF|GU_TRANFORM_3D, 1, 0, part_geom);
-                    break;
-                default:
-                    xGumScale(size, size, 1.0f);
-                    //color/fade?
-                    xGumDrawUnitTexQuad();
-                    break;
-            }
-        }
-    }
-    
-    sceGumMatrixMode(GU_VIEW);
-    sceGumLoadMatrix(&view_mat);
-    sceGumMatrixMode(GU_MODEL);
-    
-    xGuLoadStates();
+	sceGuShadeModel(GU_SMOOTH);
     sceGuDepthMask(GU_FALSE);
+    xGuLoadStates();
 }
