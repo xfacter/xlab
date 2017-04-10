@@ -159,12 +159,12 @@ static void drawUnitSphere(int slices, int rows, int attr)
     slices += 1;
     float* vertices = (float*)sceGuGetMemory((slices*rows)*attr_vert_size(attr));
     u16* indices = (u16*)sceGuGetMemory((6*(slices-1)*(rows-1))*sizeof(u16));
-    
+
     float* slice_cos = (float*)malloc(slices*sizeof(float));
     float* slice_sin = (float*)malloc(slices*sizeof(float));
     float* row_cos = (float*)malloc(rows*sizeof(float));
     float* row_sin = (float*)malloc(rows*sizeof(float));
-    
+
     float slice_inv = 1.0f/(slices-1);
     float row_inv = 1.0f/(rows-1);
 
@@ -172,15 +172,15 @@ static void drawUnitSphere(int slices, int rows, int attr)
 
     for (i = 0; i < slices; i++)
     {
-        x_sincos(i*X_2PI*slice_inv, &slice_sin[i], &slice_cos[i]);
+        x_sincos(i*2*X_PI*slice_inv, &slice_sin[i], &slice_cos[i]);
     }
     for (i = 0; i < rows; i++)
     {
         x_sincos(i*X_PI*row_inv, &row_sin[i], &row_cos[i]);
     }
-    
+
     int index = 0;
-    
+
     for (i = 0; i < slices; i++)
     {
         for (j = 0; j < rows; j++)
@@ -197,7 +197,7 @@ static void drawUnitSphere(int slices, int rows, int attr)
     free(row_sin);
 
     index = 0;
-    
+
     for (i = 0; i < slices-1; i++)
     {
         for (j = 0; j < rows-1; j++)
@@ -214,7 +214,7 @@ static void drawUnitSphere(int slices, int rows, int attr)
     		indices[index++] = i1 * rows + j1;
         }
     }
-    
+
     sceGumDrawArray(GU_TRIANGLES, attr_vtype(attr)|GU_INDEX_16BIT|GU_TRANSFORM_3D, 6*(slices-1)*(rows-1), indices, vertices);
     xGuLoadStates();
 }
@@ -239,7 +239,7 @@ void xPrimPyramid(float length, float width, float height, int attr)
     float* vertices = (float*)sceGuGetMemory((4*3 + 2*3)*attr_vert_size(attr));
     int index_f = 0;
     ScePspFVector3 normal, p1, p2, p3;
-    
+
     SET_TEXTURE(attr, vertices, index_f, 0.0f, 0.0f);
     SET_NORMAL(attr, vertices, index_f, 0.0f, 0.0f, -1.0f);
     SET_VERTEX(vertices, index_f, -0.5f*length, 0.5f*width, -0.5f*height);
@@ -249,7 +249,7 @@ void xPrimPyramid(float length, float width, float height, int attr)
     SET_TEXTURE(attr, vertices, index_f, 1.0f, 1.0f);
     SET_NORMAL(attr, vertices, index_f, 0.0f, 0.0f, -1.0f);
     SET_VERTEX(vertices, index_f, 0.5f*length, -0.5f*width, -0.5f*height);
-    
+
     SET_TEXTURE(attr, vertices, index_f, 1.0f, 1.0f);
     SET_NORMAL(attr, vertices, index_f, 0.0f, 0.0f, -1.0f);
     SET_VERTEX(vertices, index_f, 0.5f*length, -0.5f*width, -0.5f*height);
@@ -259,7 +259,7 @@ void xPrimPyramid(float length, float width, float height, int attr)
     SET_TEXTURE(attr, vertices, index_f, 0.0f, 0.0f);
     SET_NORMAL(attr, vertices, index_f, 0.0f, 0.0f, -1.0f);
     SET_VERTEX(vertices, index_f, -0.5f*length, 0.5f*width, -0.5f*height);
-    
+
     int i;
     for (i = 0; i < 4; i++)
     {
@@ -306,24 +306,24 @@ void xPrimCone(float radius, float height, int slices, int attr)
     if (attr & X_PRIM_NO_CULL) sceGuDisable(GU_CULL_FACE);
     slices += 1;
     float* vertices = (float*)sceGuGetMemory((2*3*(slices-1))*attr_vert_size(attr));
-    
+
     float* slice_cos = (float*)malloc(slices*sizeof(float));
     float* slice_sin = (float*)malloc(slices*sizeof(float));
-    
+
     float slice_inv = 1.0f/(slices-1);
-    
+
     int i, i1, index;
-    
+
     for (i = 0; i < slices; i++)
     {
-        x_sincos(i*X_2PI*slice_inv, &slice_sin[i], &slice_cos[i]);
+        x_sincos(i*2*X_PI*slice_inv, &slice_sin[i], &slice_cos[i]);
     }
-    
+
     index = 0;
     for (i = 0; i < slices-1; i++)
     {
         i1 = i+1;
-        
+
         SET_TEXTURE(attr, vertices, index, i*slice_inv, 0.0f);
         SET_NORMAL(attr, vertices, index, 0.0f, 0.0f, -1.0f);
         SET_VERTEX(vertices, index, radius*slice_cos[i], radius*slice_sin[i], -0.5f*height);
@@ -334,19 +334,19 @@ void xPrimCone(float radius, float height, int slices, int attr)
         SET_NORMAL(attr, vertices, index, 0.0f, 0.0f, -1.0f);
         SET_VERTEX(vertices, index, 0.0f, 0.0f, -0.5f*height);
     }
-    
+
     ScePspFVector3 normal, p1, p2, p3;
 
     for (i = 0; i < slices-1; i++)
     {
         i1 = i+1;
-        
+
         SET_VECTOR(p1, radius*slice_cos[i1], radius*slice_sin[i1], -0.5f*height);
         SET_VECTOR(p2, radius*slice_cos[i], radius*slice_sin[i], -0.5f*height);
         SET_VECTOR(p3, 0.0f, 0.0f, 0.5f*height);
-        
+
         if (attr & X_PRIM_NORMAL) x_normal(&normal, &p1, &p2, &p3);
-        
+
         SET_TEXTURE(attr, vertices, index, i1*slice_inv, 0.0f);
         SET_NORMAL(attr, vertices, index, normal.x, normal.y, normal.z);
         SET_VERTEX(vertices, index, p1.x, p1.y, p1.z);
@@ -357,10 +357,10 @@ void xPrimCone(float radius, float height, int slices, int attr)
         SET_NORMAL(attr, vertices, index, normal.x, normal.y, normal.z);
         SET_VERTEX(vertices, index, p3.x, p3.y, p3.z);
     }
-    
+
     free(slice_cos);
     free(slice_sin);
-    
+
     sceGumDrawArray(GU_TRIANGLES, attr_vtype(attr)|GU_TRANSFORM_3D, 2*3*(slices-1), 0, vertices);
     xGuLoadStates();
 }
@@ -374,21 +374,21 @@ void xPrimCylinder(float radius, float height, int slices, int attr)
 
     float* slice_cos = (float*)malloc(slices*sizeof(float));
     float* slice_sin = (float*)malloc(slices*sizeof(float));
-    
+
     float slice_inv = 1.0f/(slices-1);
 
     int i, i1, index;
 
     for (i = 0; i < slices; i++)
     {
-        x_sincos(i*X_2PI*slice_inv, &slice_sin[i], &slice_cos[i]);
+        x_sincos(i*2*X_PI*slice_inv, &slice_sin[i], &slice_cos[i]);
     }
 
     index = 0;
     for (i = 0; i < slices-1; i++)
     {
         i1 = i+1;
-        
+
         SET_TEXTURE(attr, vertices, index, i*slice_inv, 0.0f);
         SET_NORMAL(attr, vertices, index, 0.0f, 0.0f, -1.0f);
         SET_VERTEX(vertices, index, radius*slice_cos[i], radius*slice_sin[i], -0.5f*height);
@@ -399,7 +399,7 @@ void xPrimCylinder(float radius, float height, int slices, int attr)
         SET_NORMAL(attr, vertices, index, 0.0f, 0.0f, -1.0f);
         SET_VERTEX(vertices, index, 0.0f, 0.0f, -0.5f*height);
     }
-    
+
     for (i = 0; i < slices-1; i++)
     {
         i1 = i+1;
@@ -414,11 +414,11 @@ void xPrimCylinder(float radius, float height, int slices, int attr)
         SET_NORMAL(attr, vertices, index, 0.0f, 0.0f, 1.0f);
         SET_VERTEX(vertices, index, 0.0f, 0.0f, 0.5f*height);
     }
-    
+
     for (i = 0; i < slices-1; i++)
     {
         i1 = i+1;
-        
+
         SET_TEXTURE(attr, vertices, index, i1*slice_inv, 0.0f);
         SET_NORMAL(attr, vertices, index, slice_cos[i1], slice_sin[i1], 0.0f);
         SET_VERTEX(vertices, index, radius*slice_cos[i1], radius*slice_sin[i1], -0.5f*height);
@@ -428,7 +428,7 @@ void xPrimCylinder(float radius, float height, int slices, int attr)
         SET_TEXTURE(attr, vertices, index, i*slice_inv, 1.0f);
         SET_NORMAL(attr, vertices, index, slice_cos[i], slice_sin[i], 0.0f);
         SET_VERTEX(vertices, index, radius*slice_cos[i], radius*slice_sin[i], 0.5f*height);
-        
+
         SET_TEXTURE(attr, vertices, index, i*slice_inv, 1.0f);
         SET_NORMAL(attr, vertices, index, slice_cos[i], slice_sin[i], 0.0f);
         SET_VERTEX(vertices, index, radius*slice_cos[i], radius*slice_sin[i], 0.5f*height);
@@ -455,26 +455,26 @@ void xPrimTorus(float radius, float thickness, int slices, int rows, int attr)
     rows += 1;
     float* vertices = (float*)sceGuGetMemory(slices*rows*attr_vert_size(attr));
     u16* indices = (u16*)sceGuGetMemory(6*(slices-1)*(rows-1)*sizeof(u16));
-    
+
     float* slice_cos = (float*)malloc(slices*sizeof(float));
     float* slice_sin = (float*)malloc(slices*sizeof(float));
     float* row_cos = (float*)malloc(rows*sizeof(float));
     float* row_sin = (float*)malloc(rows*sizeof(float));
-    
+
     float slice_inv = 1.0f/(slices-1);
     float row_inv = 1.0f/(rows-1);
-    
+
     int i, j, i1, j1, index;
-    
+
     for (i = 0; i < slices; i++)
     {
-        x_sincos(i*X_2PI*slice_inv, &slice_sin[i], &slice_cos[i]);
+        x_sincos(i*2*X_PI*slice_inv, &slice_sin[i], &slice_cos[i]);
     }
     for (i = 0; i < rows; i++)
     {
-        x_sincos(i*X_2PI*row_inv, &row_sin[i], &row_cos[i]);
+        x_sincos(i*2*X_PI*row_inv, &row_sin[i], &row_cos[i]);
     }
-    
+
     index = 0;
     for (i = 0; i < slices; i++)
     {
@@ -485,12 +485,12 @@ void xPrimTorus(float radius, float thickness, int slices, int rows, int attr)
             SET_VERTEX(vertices, index, (radius + thickness*row_cos[j]) * slice_cos[i], (radius + thickness*row_cos[j]) * slice_sin[i], thickness*row_sin[j]);
     	}
     }
-    
+
     free(slice_cos);
     free(slice_sin);
     free(row_cos);
     free(row_sin);
-    
+
     index = 0;
     for (i = 0; i < slices-1; i++)
     {
@@ -498,7 +498,7 @@ void xPrimTorus(float radius, float thickness, int slices, int rows, int attr)
         {
             i1 = i+1;
             j1 = j+1;
-            
+
     		indices[index++] = i * rows + j;
     		indices[index++] = i * rows + j1;
     		indices[index++] = i1 * rows + j1;
@@ -508,7 +508,7 @@ void xPrimTorus(float radius, float thickness, int slices, int rows, int attr)
     		indices[index++] = i * rows + j;
         }
     }
-    
+
     sceGumDrawArray(GU_TRIANGLES, attr_vtype(attr)|GU_INDEX_16BIT|GU_TRANSFORM_3D, 6*(slices-1)*(rows-1), indices, vertices);
     xGuLoadStates();
 }

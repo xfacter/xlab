@@ -5,7 +5,7 @@ void xDrawStar(float radius, u16 sides, u16 add)
     int i;
     if (add != 1 && sides % add == 0)
     {
-        float angle_between = X_2PI/(sides/add)/add;
+        float angle_between = 2*X_PI/(sides/add)/add;
         sceGumPushMatrix();
         for (i = 0; i < add; i++)
         {
@@ -15,7 +15,7 @@ void xDrawStar(float radius, u16 sides, u16 add)
         sceGumPopMatrix();
         return;
     }
-    float angle_increment = add * (X_2PI/sides);
+    float angle_increment = add * (2*X_PI/sides);
     VertexF* vertices = (VertexF*)sceGuGetMemory((sides+1)*sizeof(VertexF));
     for (i = 0; i < sides; i++)
     {
@@ -41,7 +41,7 @@ void xDrawStarFill(float radius, u16 sides, u16 add)
     int i;
     if (add != 1 && sides % add == 0)
     {
-        float angle_between = X_2PI/sides;
+        float angle_between = 2*X_PI/sides;
         sceGumPushMatrix();
         for (i = 0; i < add; i++)
         {
@@ -51,7 +51,7 @@ void xDrawStarFill(float radius, u16 sides, u16 add)
         sceGumPopMatrix();
         return;
     }
-    float angle_increment = add * (X_2PI/sides);
+    float angle_increment = add * (2*X_PI/sides);
     VertexF* vertices = (VertexF*)sceGuGetMemory((sides+2)*sizeof(VertexF));
     vertices[0].x = 0.0f;
     vertices[0].y = 0.0f;
@@ -112,27 +112,27 @@ void xDraw3DRect(ScePspFVector3* pos, float length, float height, u32 c)
 {
     ScePspFMatrix4 view_mat;
     ScePspFVector3 translate;
-    
+
     sceGumMatrixMode(GU_VIEW);
     sceGumStoreMatrix(&view_mat);
     sceGumLoadIdentity();
     sceGumMatrixMode(GU_MODEL);
     sceGumLoadIdentity();
-    
+
     x_billboard(&translate, pos, &view_mat);
-    
+
     sceGumLoadIdentity();
     sceGumTranslate(&translate);
     xGumScale(length, height, 1.0f);
     sceGuColor(c);
-    
+
     xGuSaveStates();
     sceGuEnable(GU_BLEND);
     sceGuDisable(GU_LIGHTING);
     sceGuDisable(GU_TEXTURE_2D);
-    
+
     xGumDrawUnitTexQuad();
-    
+
     xGuLoadStates();
     sceGumMatrixMode(GU_VIEW);
     sceGumLoadMatrix(&view_mat);
@@ -148,7 +148,7 @@ void xDraw3DLine(ScePspFVector3* cam, ScePspFVector3* p1, ScePspFVector3* p2, fl
 
     x_billboard_dir(&up, cam, p1, &dir);
     x_normalize(&up, 0.5f);
-    
+
     VertexF* vertices = (VertexF*)sceGuGetMemory(4*sizeof(VertexF));
     vertices[0].x = p1->x - h1*up.x;
     vertices[0].y = p1->y - h1*up.y;

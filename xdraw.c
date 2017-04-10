@@ -148,8 +148,8 @@ void xDrawRectOutline(int x, int y, int w, int h, u32 c)
 
 void xDrawPolygon(int x, int y, float r, int n, u32 c0, u32 c1)
 {
-    float angle = X_PI_2;
-    float angle_increment = X_2PI/n;
+    float angle = X_PI/2.0f;
+    float angle_increment = 2*X_PI/n;
     CVertex2D* vertices = (CVertex2D*)sceGuGetMemory((n+2)*sizeof(CVertex2D));
     vertices[0].color = c0;
     vertices[0].x = 0;
@@ -176,8 +176,8 @@ void xDrawPolygon(int x, int y, float r, int n, u32 c0, u32 c1)
 
 void xDrawPolygonOutline(int x, int y, float r, int n, u32 c)
 {
-    float angle = X_PI_2;
-    float angle_increment = X_2PI/n;
+    float angle = X_PI/2.0f;
+    float angle_increment = 2*X_PI/n;
     Vertex2D* vertices = (Vertex2D*)sceGuGetMemory((n+1)*sizeof(Vertex2D));
     int i;
     for (i = 0; i < n; i++)
@@ -199,8 +199,8 @@ void xDrawPolygonOutline(int x, int y, float r, int n, u32 c)
 
 void xDrawPolygon2(int x, int y, float r0, float r1, int n, u32 c0, u32 c1, u32 c2)
 {
-    float angle = X_PI_2;
-    float angle_increment = X_2PI/n;
+    float angle = X_PI/2.0f;
+    float angle_increment = 2*X_PI/n;
     CVertex2D* vertices = (CVertex2D*)sceGuGetMemory((2*n+2)*sizeof(CVertex2D));
     vertices[0].color = c0;
     vertices[0].x = 0;
@@ -231,8 +231,8 @@ void xDrawPolygon2(int x, int y, float r0, float r1, int n, u32 c0, u32 c1, u32 
 
 void xDrawPolygon2Outline(int x, int y, float r0, float r1, int n, u32 c)
 {
-    float angle = X_PI_2;
-    float angle_increment = X_2PI/n;
+    float angle = X_PI/2.0f;
+    float angle_increment = 2*X_PI/n;
     Vertex2D* vertices = (Vertex2D*)sceGuGetMemory((2*n+1)*sizeof(Vertex2D));
     int i;
     for (i = 0; i < n; i++)

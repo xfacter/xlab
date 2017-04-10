@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include "astar.h"
+#include "xpath.h"
 
-#include "xlib/xmem.h"
+#include "xmem.h"
 #define malloc(x) x_malloc(x)
 #define free(x) x_free(x)
 

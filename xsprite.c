@@ -4,8 +4,8 @@ int xSpriteBind(xSprite* object, xTexture* texture, x_anim* my_anims, int num_an
 {
     if (!object || !texture || !my_anims) return 0;
     object->texture = texture;
-    object->uframes = texture->Width()/fwidth;
-    object->vframes = texture->Height()/fheight;
+    object->uframes = texture->width/fwidth;
+    object->vframes = texture->height/fheight;
     object->frame_width = fwidth;
     object->frame_height = fheight;
     object->anims_use = my_anims;
@@ -43,15 +43,18 @@ void xSpriteDraw(xSprite* object, int x, int y)
 {
     if (!object || !object->texture) return;
     //xTexDrawSect(object->texture, x, y, object->frame*object->frame_width, object->anim*object->frame_height, object->frame_width, object->frame_height);
-    xTexDrawSect(object->texture, x, y,
-                 object->frame_width * (object->frame % object->uframes), object->frame_height * (object->frame / object->uframes),
-                 object->frame_width, object->frame_height);
+    xTexDraw(object->texture, x, y,
+             object->frame_width, object->frame_height,
+             object->frame_width * (object->frame % object->uframes), object->frame_height * (object->frame / object->uframes),
+             object->frame_width, object->frame_height);
 }
 
+#if 0
 void xSpriteDraw3D(xSprite* object, ScePspFVector3* pos, float length, float height)
 {
     if (!object || !object->texture) return;
-    xTexDraw3DSect(object->texture, pos, length, height,
+    xTexDrawSprite(object->texture, pos, length, height,
                    object->frame_width * (object->frame % object->uframes), object->frame_height * (object->frame / object->uframes),
                    object->frame_width, object->frame_height);
 }
+#endif

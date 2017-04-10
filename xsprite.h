@@ -31,7 +31,7 @@ void xSpriteUpdate(xSprite* object, float dt);
 
 void xSpriteDraw(xSprite* object, int x, int y);
 
-void xSpriteDraw3D(xSprite* object, ScePspFVector3* pos, float length, float height);
+//void xSpriteDraw3D(xSprite* object, ScePspFVector3* pos, float length, float height);
 
 #ifdef __cplusplus
 }

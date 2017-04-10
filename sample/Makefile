@@ -20,7 +20,7 @@ TARGET = $(BUILD_PATH)/$(BIN_NAME)
 #BUILD_PRX = 1
 
 OBJS = main.o xlib.o xmem.o xlog.o xmath.o xtime.o xctrl.o xgraphics.o \
-	xtext.o xtexture.o xmd2.o xwav.o xobj.o xprim.o xcam.o \
+	xtext.o xtexture.o xmd2.o xsound.o xobj.o xprim.o xcam.o \
 	xdraw.o #xsprite.o xscreen.o xlist.o
 
 CFLAGS = -O2 -g -Wall

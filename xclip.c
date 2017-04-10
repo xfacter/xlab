@@ -1,16 +1,10 @@
 #include <string.h>
 #include <pspgu.h>
 #include <pspgum.h>
+#include "xconfig.h"
 #include "xmath.h"
 
 #include "xclip.h"
-
-#ifdef X_DEBUG
-#include "xlog.h"
-#define X_LOG(format, ... ) xLogPrintf("xClip: " format, __VA_ARGS__)
-#else
-#define X_LOG(format, ... ) do{}while(0)
-#endif
 
 static void normalize_plane(ScePspFVector4* plane)
 {
@@ -107,12 +101,12 @@ int xClipDrawArrayFrustum(ScePspFVector4* planes, int prim, int vtype, int count
                 if (i == 0) prev = count - 1;
                 else prev = i - 1;
             }
-            
+
             ptr_this = (float*)((u32)vertices + vertex_index_offset(vtype, i, indices) + vertex_offset(vtype));
             ptr_prev = (float*)((u32)vertices + vertex_index_offset(vtype, prev, indices) + vertex_offset(vtype));
             t0 = planes[j].x*ptr_prev[0] + planes[j].y*ptr_prev[1] + planes[j].z*ptr_prev[2] + planes[j].w;
             t1 = planes[j].x*ptr_this[0] + planes[j].y*ptr_this[1] + planes[j].z*ptr_this[2] + planes[j].w;
-            
+
             if (((t0 >= 0) ^ (t1 >= 0)) && t0 != t1)
             {
                 tt = t0/(t0-t1);

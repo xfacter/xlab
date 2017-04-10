@@ -6,13 +6,6 @@
 
 #include "xmd2.h"
 
-#ifdef X_DEBUG
-#include "xlog.h"
-#define X_LOG(format, ... ) xLogPrintf("xMd2: " format, __VA_ARGS__)
-#else
-#define X_LOG(format, ... ) do{}while(0)
-#endif
-
 #define MD2_MAX_TRIS       (4096)
 #define MD2_MAX_VERTS      (2048)
 #define MD2_MAX_TEX_COORDS (2048)
@@ -261,37 +254,37 @@ int xMd2Load(xMd2* my_md2, char* filename)
     void* frame_data;
     md2_frame* frame;
     int i, j;
-    
+
     FILE* file = fopen(filename, "rb");
     if (!file) return 0;
-    
+
     fread(&header, 1, sizeof(md2_header), file);
-    
+
     X_LOG("framesize: %i, num_frames: %i, num_verts: %i, num_glcmds: %i", header.framesize, header.num_frames, header.num_xyz, header.num_glcmds);
-    
+
     if (header.ident != MD2_IDENT || header.version != MD2_VERSION)
     {
         fclose(file);
         return 0;
     }
-    
+
     my_md2->num_frames = header.num_frames;
     my_md2->num_verts = header.num_xyz;
     my_md2->num_glcmds = header.num_glcmds;
-    
+
     my_md2->vertices = (ScePspFVector3*)x_malloc(my_md2->num_verts * my_md2->num_frames * sizeof(ScePspFVector3));
     my_md2->normal_indices = (u8*)x_malloc(my_md2->num_verts * my_md2->num_frames * sizeof(u8));
     my_md2->gl_commands = (int*)x_malloc(my_md2->num_glcmds * sizeof(int));
     frame_data = x_malloc(my_md2->num_frames * header.framesize);
-    
+
     fseek(file, header.ofs_frames, SEEK_SET);
     fread(frame_data, my_md2->num_frames * header.framesize, 1, file);
-    
+
     fseek(file, header.ofs_glcmds, SEEK_SET);
     fread(my_md2->gl_commands, my_md2->num_glcmds * sizeof(int), 1, file);
-    
+
     fclose(file);
-    
+
     for (i = 0; i < my_md2->num_frames; i++)
     {
         frame = (md2_frame*)((u32)frame_data + header.framesize * i);
@@ -303,7 +296,7 @@ int xMd2Load(xMd2* my_md2, char* filename)
             my_md2->normal_indices[i*my_md2->num_verts + j] = frame->verts[j].lightnormalindex;
         }
     }
-    
+
     x_free(frame_data);
     X_LOG("Successfully loaded MD2.", 0);
     return 1;
