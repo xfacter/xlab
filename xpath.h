@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __ASTAR_H__
-#define __ASTAR_H__
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +56,4 @@ int astar_get_path(astar_path* path, int idx);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

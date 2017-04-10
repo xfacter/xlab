@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_CLIP_H__
-#define __X_CLIP_H__
+#pragma once
 
 #include <psptypes.h>
 
@@ -28,6 +27,4 @@ int xClipPointInFrustum(xFrustum* f, ScePspFVector3* p);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

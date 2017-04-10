@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_MD2_H__
-#define __X_MD2_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -77,6 +76,4 @@ void xMd2AnimDraw(xMd2Object* object);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

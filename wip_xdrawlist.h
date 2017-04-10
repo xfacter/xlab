@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_LIST_H__
-#define __X_LIST_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -26,6 +25,4 @@ void xListDestroy(void* ptr);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

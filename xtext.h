@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_TEXT_H__
-#define __X_TEXT_H__
+#pragma once
 
 #include "xconfig.h"
 #include "xtexture.h"
@@ -64,6 +63,4 @@ float xText3DPrintf(ScePspFVector3* pos, float char_scale, float height, char* t
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

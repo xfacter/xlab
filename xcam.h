@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_CAM_H__
-#define __X_CAM_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -94,7 +93,5 @@ xCamRotateAroundX(xCamera* cam, float angle, float tx, float ty, float tz);
 xCamRotateAroundY(xCamera* cam, float angle, float tx, float ty, float tz);
 
 xCamRotateAroundZ(xCamera* cam, float angle, float tx, float ty, float tz);
-
-#endif
 
 #endif

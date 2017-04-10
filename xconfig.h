@@ -6,13 +6,16 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_CONFIG_H__
-#define __X_CONFIG_H__
+#pragma once
 
 #include <stdio.h>
 #include <pspkernel.h>
 #include <psptypes.h>
 #include "xlog.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* TODO:
     * 3D text (xtext.h) (fix)
@@ -141,4 +144,6 @@ typedef struct {
 
 #define TCVertex2D_vtype (GU_TEXTURE_16BIT|GU_COLOR_8888|GU_VERTEX_16BIT)
 
+#ifdef __cplusplus
+}
 #endif

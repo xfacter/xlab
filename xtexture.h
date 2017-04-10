@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_TEXTURE_H__
-#define __X_TEXTURE_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -71,6 +70,4 @@ void xTexDrawAngle(xTexture* t, float x, float y, float w, float h, int tx, int 
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_MATH_H__
-#define __X_MATH_H__
+#pragma once
 
 #include "xconfig.h"
 #include <math.h>
@@ -106,6 +105,4 @@ xColor4f* xCol4Lerp(xColor4f* r, xColor4f* a, xColor4f* b, float t);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

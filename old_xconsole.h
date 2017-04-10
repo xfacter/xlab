@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_CONSOLE_H__
-#define __X_CONSOLE_H__
+#pragma once
 
 #include <psptypes.h>
 #include "xtexture.h"
@@ -55,5 +54,3 @@ public:
     void UpdateConsole(float dt);
     void RenderConsole(xTexture* font, int x, int y, int width, int height, int line_height, bool aa);
 };
-
-#endif

@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_PRIM_H__
-#define __X_PRIM_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -43,6 +42,4 @@ void xPrimTorus(float radius, float thickness, int slices, int rows, int attr);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

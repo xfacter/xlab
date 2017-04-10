@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_CTRL_H__
-#define __X_CTRL_H__
+#pragma once
 
 #include <pspctrl.h>
 #include "xconfig.h"
@@ -51,6 +50,4 @@ float xCtrlAnalogY();
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

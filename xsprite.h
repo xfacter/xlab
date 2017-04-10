@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_SPRITE_H__
-#define __X_SPRITE_H__
+#pragma once
 
 #include "xconfig.h"
 #include "xtexture.h"
@@ -43,6 +42,4 @@ void xSpriteDraw(xSprite* object, int x, int y);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_SCREEN_H__
-#define __X_SCREEN_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -64,6 +63,4 @@ void xScreenDepthFog(u32 color, int lowbit);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

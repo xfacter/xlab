@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_ORTHO_X__
-#define __X_ORTHO_X__
+#pragma once
 
 #include "xconfig.h"
 
@@ -27,6 +26,4 @@ void xDraw3DLine(ScePspFVector3* cam, ScePspFVector3* p0, ScePspFVector3* p1, fl
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

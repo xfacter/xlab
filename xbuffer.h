@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_BUFFER_H__
-#define __X_BUFFER_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -42,6 +41,4 @@ void xBuffer4x4Pcf(xBuffer* a, xBuffer* b);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

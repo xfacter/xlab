@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_VERTEX_H__
-#define __X_VERTEX_H__
+#pragma once
 
 #include <psptypes.h>
 
@@ -57,6 +56,4 @@ void* xVertNewRotatedZ(int vtype, int count, void* vertices, float radians);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_INI_H__
-#define __X_INI_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -29,6 +28,4 @@ char* xIniGetString(FILE* f, char* param, char* str, char* notfound);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

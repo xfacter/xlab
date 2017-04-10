@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_DRAW_H__
-#define __X_DRAW_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -36,6 +35,4 @@ void xDrawPolygon2Outline(int x, int y, float r0, float r1, int n, u32 c);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

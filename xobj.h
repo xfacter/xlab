@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_OBJ_H__
-#define __X_OBJ_H__
+#pragma once
 
 #include "xconfig.h"
 
@@ -35,6 +34,4 @@ void xObjDraw(xObj* object, int reverse_frontface);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

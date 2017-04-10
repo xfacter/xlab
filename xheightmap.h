@@ -6,8 +6,7 @@
  * subject to all terms as reproduced in the included LICENSE file.
  */
 
-#ifndef __X_HEIGHTMAP__
-#define __X_HEIGHTMAP__
+#pragma once
 
 /* TODO:
 	change to a better OO design...
@@ -81,6 +80,4 @@ void normal_from_grid(xHeightmap* h, ScePspFVector3* out, int x, int y, int whic
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
