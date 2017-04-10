@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 #include <pspgu.h>
 #include <pspgum.h>
 #include "xmem.h"
@@ -444,13 +452,13 @@ void xScreenGrayscale()
     sceGuTexFunc(GU_TFX_DECAL, GU_TCC_RGB);
     sceGuTexFilter(GU_NEAREST, GU_NEAREST);
     sceGuTexMode(GU_PSM_T32, 0, 0, 0);
-    
+
     sceGuBlendFunc(GU_ADD, GU_FIX, GU_FIX, 0x00ffffff, 0x00ffffff);
 
     void* draw_buf = xGuDrawPtr(1, 1);
     void* temp_buf = xGuStridePtr(0, 1);
     sceGuDrawBufferList(GU_PSM_8888, X_CACHED(X_VREL(temp_buf)), BLOCK_BUFFER_WIDTH);
-    
+
     xGuSaveStates();
     sceGuEnable(GU_TEXTURE_2D);
     sceGuDisable(GU_DEPTH_TEST);
@@ -469,9 +477,9 @@ void xScreenGrayscale()
         sceGuCopyImage(GU_PSM_8888, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_BUFFER_WIDTH, temp_buf, i, 0, X_BUFFER_WIDTH, draw_buf);
     }
     xGuLoadStates();
-    
+
     sceGuDrawBufferList(GU_PSM_8888, draw_buf, X_BUFFER_WIDTH);
-    
+
     sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 }
 
@@ -562,18 +570,18 @@ void xScreenThermal()
         x_screen_draw_section();
         sceGuCopyImage(GU_PSM_8888, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_BUFFER_WIDTH, temp_buf, i, 0, X_BUFFER_WIDTH, draw_buf);
     }
-    
+
     sceGuClutLoad(32, thermal_palette);
     sceGuClutMode(GU_PSM_8888, 0, 0xff, 0);
     sceGuDisable(GU_BLEND);
-    
+
     for (i = 0; i < X_SCREEN_WIDTH; i += BLOCK_WIDTH)
     {
         sceGuTexImage(0, BLOCK_POW2_WIDTH, BLOCK_POW2_HEIGHT, X_BUFFER_WIDTH, (void*)((u32)draw_buf + i*4));
         x_screen_draw_section();
         sceGuCopyImage(GU_PSM_8888, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_BUFFER_WIDTH, temp_buf, i, 0, X_BUFFER_WIDTH, draw_buf);
     }
-    
+
     xGuLoadStates();
 
     sceGuDrawBufferList(GU_PSM_8888, draw_buf, X_BUFFER_WIDTH);
@@ -684,7 +692,7 @@ void xScreenDichrome(u32 light, u32 dark)
         x_screen_draw_section();
         sceGuCopyImage(GU_PSM_8888, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_BUFFER_WIDTH, temp_buf, i, 0, X_BUFFER_WIDTH, draw_buf);
     }
-    
+
     sceGuClutLoad(32, dichrome_palette);
     sceGuClutMode(GU_PSM_8888, 0, 0xff, 0);
     sceGuDisable(GU_BLEND);
@@ -695,7 +703,7 @@ void xScreenDichrome(u32 light, u32 dark)
         x_screen_draw_section();
         sceGuCopyImage(GU_PSM_8888, 0, 0, BLOCK_WIDTH, BLOCK_HEIGHT, BLOCK_BUFFER_WIDTH, temp_buf, i, 0, X_BUFFER_WIDTH, draw_buf);
     }
-    
+
     xGuLoadStates();
 
     sceGuDrawBufferList(GU_PSM_8888, draw_buf, X_BUFFER_WIDTH);

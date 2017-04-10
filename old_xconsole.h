@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 #ifndef __X_CONSOLE_H__
 #define __X_CONSOLE_H__
 
@@ -15,7 +23,7 @@ private:
     char* string;
 public:
     unsigned int color;
-    
+
     xConsoleString(int max_string_len);
     ~xConsoleString();
     xConsoleString& operator=(char* new_string);

@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 /* some prims malloc memory to read calculated values into. we dont want to log every alloc/free, so use stdlib instead of xmem */
 #include <stdlib.h>
 #include <pspgu.h>

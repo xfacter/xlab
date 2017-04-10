@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 #ifndef __X_ORTHO_X__
 #define __X_ORTHO_X__
 

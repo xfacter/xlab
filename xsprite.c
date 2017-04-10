@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 #include "xsprite.h"
 
 int xSpriteBind(xSprite* object, xTexture* texture, x_anim* my_anims, int num_anim, int fwidth, int fheight, int default_anim)

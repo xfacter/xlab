@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 #include <string.h>
 #include <stdlib.h>
 #include <pspgu.h>
@@ -129,7 +137,7 @@ void xVertSoftNormals(int vtype, int count, void* vertices)
         nx = (float*)((u32)vertices + n_offset + 0*sizeof(float));
         ny = (float*)((u32)vertices + n_offset + 1*sizeof(float));
         nz = (float*)((u32)vertices + n_offset + 2*sizeof(float));
-        
+
         float mag = x_sqrtf(SQR(x) + SQR(y) + SQR(z));
         if (mag > 0)
         {
@@ -163,33 +171,33 @@ void xVertHardNormals(int prim, int vtype, int count, void* vertices)
         p3.x = *(float*)((u32)vertices + 2*total_offset(vtype) + v_offset + 0*sizeof(float));
         p3.y = *(float*)((u32)vertices + 2*total_offset(vtype) + v_offset + 1*sizeof(float));
         p3.z = *(float*)((u32)vertices + 2*total_offset(vtype) + v_offset + 2*sizeof(float));
-        
+
         x_normal(&n, &p1, &p2, &p3);
-        
+
         nx = (float*)((u32)vertices + 0*total_offset(vtype) + n_offset + 0*sizeof(float));
         ny = (float*)((u32)vertices + 0*total_offset(vtype) + n_offset + 1*sizeof(float));
         nz = (float*)((u32)vertices + 0*total_offset(vtype) + n_offset + 2*sizeof(float));
-        
+
         *nx = n.x;
         *ny = n.y;
         *nz = n.z;
-        
+
         nx = (float*)((u32)vertices + 1*total_offset(vtype) + n_offset + 0*sizeof(float));
         ny = (float*)((u32)vertices + 1*total_offset(vtype) + n_offset + 1*sizeof(float));
         nz = (float*)((u32)vertices + 1*total_offset(vtype) + n_offset + 2*sizeof(float));
-        
+
         *nx = n.x;
         *ny = n.y;
         *nz = n.z;
-        
+
         nx = (float*)((u32)vertices + 2*total_offset(vtype) + n_offset + 0*sizeof(float));
         ny = (float*)((u32)vertices + 2*total_offset(vtype) + n_offset + 1*sizeof(float));
         nz = (float*)((u32)vertices + 2*total_offset(vtype) + n_offset + 2*sizeof(float));
-        
+
         *nx = n.x;
         *ny = n.y;
         *nz = n.z;
-        
+
         vertices = (void*)((u32)vertices + 3*total_offset(vtype));
     }
 }
@@ -230,7 +238,7 @@ void xVertTranslate(int vtype, int count, void* vertices, ScePspFVector3* transl
             *y += (s8)translate->y;
             *z += (s8)translate->z;
         }
-        
+
         vertices = (void*)((u32)vertices + total_offset(vtype));
     }
 }
@@ -239,7 +247,7 @@ void xVertRotateX(int vtype, int count, void* vertices, float radians)
 {
     float sine, cosine;
     x_sincos(radians, &sine, &cosine);
-    
+
     int v_offset = texture_offset(vtype) + color_offset(vtype) + normal_offset(vtype);
     int i;
     for (i = 0; i < count; i++)
@@ -277,7 +285,7 @@ void xVertRotateX(int vtype, int count, void* vertices, float radians)
             *y = (s8)((cosine * temp_y) - (sine * temp_z));
             *z = (s8)((sine * temp_y) + (cosine * temp_z));
         }
-        
+
         vertices = (void*)((u32)vertices + total_offset(vtype));
     }
 }
@@ -286,7 +294,7 @@ void xVertRotateY(int vtype, int count, void* vertices, float radians)
 {
     float sine, cosine;
     x_sincos(radians, &sine, &cosine);
-    
+
     int v_offset = texture_offset(vtype) + color_offset(vtype) + normal_offset(vtype);
     int i;
     for (i = 0; i < count; i++)
@@ -324,7 +332,7 @@ void xVertRotateY(int vtype, int count, void* vertices, float radians)
             *x = (s8)((cosine * temp_x) + (sine * temp_z));
             *z = (s8)(-(sine * temp_x) + (cosine * temp_z));
         }
-        
+
         vertices = (void*)((u32)vertices + total_offset(vtype));
     }
 }
@@ -333,7 +341,7 @@ void xVertRotateZ(int vtype, int count, void* vertices, float radians)
 {
     float sine, cosine;
     x_sincos(radians, &sine, &cosine);
-    
+
     int v_offset = texture_offset(vtype) + color_offset(vtype) + normal_offset(vtype);
     int i;
     for (i = 0; i < count; i++)
@@ -371,7 +379,7 @@ void xVertRotateZ(int vtype, int count, void* vertices, float radians)
             *x = (s8)((cosine * temp_x) - (sine * temp_y));
             *y = (s8)((sine * temp_x) + (cosine * temp_y));
         }
-        
+
         vertices = (void*)((u32)vertices + total_offset(vtype));
     }
 }

@@ -1,3 +1,11 @@
+/**
+ * This file belongs to the 'xlab' game engine.
+ * Copyright 2009 xfacter
+ * Copyright 2016 wickles
+ * This work is licensed under the LGPLv3
+ * subject to all terms as reproduced in the included LICENSE file.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -83,7 +91,7 @@ xConsole::xConsole(int max_strings, int max_string_len)
 {
     num_strings = (u16)max_strings;
     string_length = (u16)max_string_len;
-    
+
     console_strings = new xConsoleString*[num_strings];
     for (int i = 0; i < num_strings; i++) console_strings[i] = new xConsoleString(string_length);
 }
@@ -92,10 +100,10 @@ xConsole::xConsole(int max_strings, int max_string_len, float remain_time, float
 {
     num_strings = (u16)max_strings;
     string_length = (u16)max_string_len;
-    
+
     console_strings = new xConsoleString*[num_strings];
     for (int i = 0; i < num_strings; i++) console_strings[i] = new xConsoleString(string_length);
-    
+
     Settings(remain_time, fade_time);
 }
 
@@ -118,7 +126,7 @@ void xConsole::Printf(unsigned int color, char* string, ... )
     va_start(ap, string);
     vsnprintf(buffer, sizeof(buffer), string, ap);
     va_end(ap);
-    
+
     Print(color, buffer);
 }
 
@@ -155,11 +163,11 @@ void xConsole::RenderConsole(xTexture* font, int x, int y, int width, int height
         for (int i = 0; i < num_strings; i++)
         {
             if (line < y || !console_strings[i]->Alive()) break;
-            
+
             str_begin = console_strings[i]->String();
             str_track = str_begin;
             str_len = strlen(str_begin);
-            
+
             if (str_len > 0)
             {
                 for (lines = 0; lines < 16; lines++)
@@ -168,7 +176,7 @@ void xConsole::RenderConsole(xTexture* font, int x, int y, int width, int height
                     str_track += line_length[lines];
                     if (line_length[lines] == 0 || (u32)str_track >= (u32)str_begin + str_len) break;
                 }
-                
+
                 while(lines > 0 && line >= y)
                 {
                     lines -= 1;
