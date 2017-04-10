@@ -1,19 +1,14 @@
 In need of overhaul:
-    * particles
     * md2
     * cam
     * render buffer / effects
     * poly clipper
     * draw
-    * obj
-    * wav
-    * ... pretty much everything
-
-work on:
-    * me mp3
-    * ...
 
 TODO:
+    * Documentation
+    * TTF font support
+    * update leftover/old/WIP code
     * make all text same size, get scale factor and multiply, use pixel sizes
         as input so any size will be the same on the PSP with same input
     * change md2 to use vertex buffer, no display list memory crap
