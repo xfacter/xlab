@@ -2,7 +2,7 @@
 #include <pspgu.h>
 #include <pspgum.h>
 #include <pspkernel.h>
-#include "xlib.h"
+#include "xlab.h"
 #include "xmem.h"
 #include "xctrl.h"
 #include "xtime.h"

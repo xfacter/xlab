@@ -1,12 +1,12 @@
 ### PROJECT SETTINGS ###
-BIN_NAME = xlibtest
+BIN_NAME = xlabtest
 PBP_PATH = Bundle
 SRC_PATH = ..
 BIN_PATH = .
 BUILD_PATH = .
 
 # Basic configuration for PSPSDK. Refer to $(PSPSDK)/lib/build.mak
-PSP_EBOOT_TITLE = xlibtest
+PSP_EBOOT_TITLE = xlabtest
 #PSP_EBOOT_ICON = $(PBP_PATH)/icon0.png
 #PSP_EBOOT_ICON1 = $(PBP_PATH)/icon1.pmf
 #PSP_EBOOT_UNKPNG = $(PBP_PATH)/pic0.png
@@ -19,7 +19,7 @@ EXTRA_TARGETS = $(PSP_EBOOT)
 TARGET = $(BUILD_PATH)/$(BIN_NAME)
 #BUILD_PRX = 1
 
-OBJS = main.o xlib.o xmem.o xlog.o xmath.o xtime.o xctrl.o xgraphics.o \
+OBJS = main.o xlab.o xmem.o xlog.o xmath.o xtime.o xctrl.o xgraphics.o \
 	xtext.o xtexture.o xmd2.o xsound.o xobj.o xprim.o xcam.o \
 	xdraw.o #xsprite.o xscreen.o xlist.o
 

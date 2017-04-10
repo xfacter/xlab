@@ -1,14 +1,14 @@
 #include <pspsdk.h>
 
-#include "xlib.h"
+#include "xlab.h"
 
-#ifdef X_LIB_KERNEL
-PSP_MODULE_INFO("xLibApp", PSP_MODULE_KERNEL, 1, 1);
+#ifdef X_PSP_KERNEL
+PSP_MODULE_INFO("xlabApp", PSP_MODULE_KERNEL, 1, 1);
 PSP_MAIN_THREAD_ATTR(0);
 //PSP_HEAP_SIZE_MAX();
 PSP_HEAP_SIZE_KB(-64);
 #else
-PSP_MODULE_INFO("xLibApp", PSP_MODULE_USER, 1, 1);
+PSP_MODULE_INFO("xlabApp", PSP_MODULE_USER, 1, 1);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER|PSP_THREAD_ATTR_VFPU);
 //PSP_HEAP_SIZE_MAX();
 PSP_HEAP_SIZE_KB(-64);
@@ -48,7 +48,7 @@ extern int xSetupCallbacks()
     return thid;
 }
 
-#ifdef X_LIB_KERNEL
+#ifdef X_PSP_KERNEL
 static int xUserThread(SceSize args, void* argp)
 {
     remove("./xlog.txt");

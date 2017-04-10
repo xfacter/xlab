@@ -14,8 +14,8 @@
 
 #define X_DEBUG
 
-#define X_LIB_USER
-//#define X_LIB_KERNEL
+#define X_PSP_USER
+//#define X_PSP_KERNEL
 
 //#define X_GRAPHICS_2D
 #define X_GRAPHICS_3D
